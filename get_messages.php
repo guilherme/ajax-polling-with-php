@@ -1,16 +1,15 @@
-<?php
+<?php 
   require("connection.php");
-  $sql = "SELECT * FROM messages WHERE id >= ".(int)$_GET['since_id']." ORDER BY id ASC";
+  $sql = "SELECT * FROM messages WHERE id > ".(int)$_GET['since_id']." ORDER BY id ASC";
   $res = mysql_query($sql,$connection);
   if(!$res) {
     die("Erro ao executar a query $res ".mysql_error());
   }
-  header('content-type: application/json');
+  $data = array();
   if(mysql_num_rows($res)) {
     while($message = mysql_fetch_array($res)) {
-      echo '{ "user": "'.$message['user'].'", "time": '.$message['time'].', "message": "'.$message['message'].'" },';
+      array_unshift($data,array('id' => $message['id'], 'user' => $message['user'], 'time' => $message['time'], 'message' => utf8_encode($message['message'])));
     }
-  } else {
-    echo '{}';
   }
+  echo json_encode($data);
 ?>
